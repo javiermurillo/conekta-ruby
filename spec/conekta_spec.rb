@@ -477,6 +477,9 @@ class ConektaTest < Test::Unit::TestCase
       @mock = double
       Conekta.mock_rest_client = @mock
 
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
       @mock.should_receive(:post){
         test_response(test_charge)
       }.once
@@ -487,177 +490,256 @@ class ConektaTest < Test::Unit::TestCase
 
       Conekta.mock_rest_client = nil
     end
+
+#    it "deleting should send no props and result in an object that has no props other deleted" do
+#      @mock = double
+#      Conekta.mock_rest_client = @mock
+#
+#      @mock.expects(:get).never
+#      @mock.expects(:post).never
+#      @mock.should_receive(:delete){|arg1, arg2, arg3|
+#        arg1.should eq("#{Conekta.api_base}/v1/charges/ch_test_charge")
+#        arg2.should eq(nil)
+#        arg3.should eq(nil)
+#
+#        test_response({ "id" => "test_charge", "deleted" => true })
+#      }.once
+#
+#      c = Conekta::Customer.construct_from(test_charge)
+#      c.delete
+#      c.deleted.should eq(true)
+#
+#      c.livemode.to raise_error(NoMethodError)
+#    end
+
+    it "loading an object with properties that have specific types should instantiate those classes" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:get){
+        test_response(test_charge)
+      }.once
+
+      c = Conekta::Charge.retrieve("test_charge")
+      c.card.should be_kind_of(Conekta::ConektaObject)
+      #c.card.object == 'card'
+
+      Conekta.mock_rest_client = nil
+    end
+
+    it "loading all of an APIResource should return an array of recursively instantiated objects" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:get){
+        test_response(test_charge_array)
+      }.once
+      c = Conekta::Charge.all
+      c = c.data
+      c.should be_kind_of(Array)
+      c[0].should be_kind_of(Conekta::Charge)
+      c[0].card.should be_kind_of(Conekta::ConektaObject)
+      #c[0].card.object == 'card'
+      
+      Conekta.mock_rest_client = nil
+    end
   end
 
-#      should "deleting should send no props and result in an object that has no props other deleted" do
-#        @mock.expects(:get).never
-#        @mock.expects(:post).never
-#        @mock.expects(:delete).with("#{Conekta.api_base}/v1/charges/c_test_charge", nil, nil).once.returns(test_response({ "id" => "test_charge", "deleted" => true }))
-#
-#        c = Conekta::Charge.construct_from(test_charge)
-#        c.delete
-#        assert_equal true, c.deleted
-#
-#        assert_raises NoMethodError do
-#          c.livemode
-#        end
-#      end
-#
-#      should "loading an object with properties that have specific types should instantiate those classes" do
-#        @mock.expects(:get).once.returns(test_response(test_charge))
-#        c = Conekta::Charge.retrieve("test_charge")
-#        assert c.card.kind_of?(Conekta::ConektaObject) && c.card.object == 'card'
-#      end
-#
-#      should "loading all of an APIResource should return an array of recursively instantiated objects" do
-#        @mock.expects(:get).once.returns(test_response(test_charge_array))
-#        c = Conekta::Charge.all.data
-#        assert c.kind_of? Array
-#        assert c[0].kind_of? Conekta::Charge
-#        assert c[0].card.kind_of?(Conekta::ConektaObject) && c[0].card.object == 'card'
-#      end
-#
-#      context "account tests" do
-#        should "account should be retrievable" do
-#          resp = {:email => "test+bindings@conekta.com", :charge_enabled => false, :details_submitted => false}
-#          @mock.expects(:get).once.returns(test_response(resp))
-#          a = Conekta::Account.retrieve
-#          assert_equal "test+bindings@conekta.com", a.email
-#          assert !a.charge_enabled
-#          assert !a.details_submitted
-#        end
-#      end
-#
-#      context "list tests" do
-#        should "be able to retrieve full lists given a listobject" do
-#          @mock.expects(:get).twice.returns(test_response(test_charge_array))
-#          c = Conekta::Charge.all
-#          assert c.kind_of?(Conekta::ListObject)
-#          assert_equal('/v1/charges', c.url)
-#          all = c.all
-#          assert all.kind_of?(Conekta::ListObject)
-#          assert_equal('/v1/charges', all.url)
-#          assert all.data.kind_of?(Array)
-#        end
-#      end
-#
-#      context "charge tests" do
-#
-#        should "charges should be listable" do
-#          @mock.expects(:get).once.returns(test_response(test_charge_array))
-#          c = Conekta::Charge.all
-#          assert c.data.kind_of? Array
-#          c.each do |charge|
-#            assert charge.kind_of?(Conekta::Charge)
-#          end
-#        end
-#
-#        should "charges should be refundable" do
-#          @mock.expects(:get).never
-#          @mock.expects(:post).once.returns(test_response({:id => "ch_test_charge", :refunded => true}))
-#          c = Conekta::Charge.new("test_charge")
-#          c.refund
-#          assert c.refunded
-#        end
-#
-#        should "charges should not be deletable" do
-#          assert_raises NoMethodError do
-#            @mock.expects(:get).once.returns(test_response(test_charge))
-#            c = Conekta::Charge.retrieve("test_charge")
-#            c.delete
-#          end
-#        end
-#
-#        should "charges should be updateable" do
-#          @mock.expects(:get).once.returns(test_response(test_charge))
-#          @mock.expects(:post).once.returns(test_response(test_charge))
-#          c = Conekta::Charge.new("test_charge")
-#          c.refresh
-#          c.mnemonic = "New charge description"
-#          c.save
-#        end
-#
-#        should "charges should have Card objects associated with their Card property" do
-#          @mock.expects(:get).once.returns(test_response(test_charge))
-#          c = Conekta::Charge.retrieve("test_charge")
-#          assert c.card.kind_of?(Conekta::ConektaObject) && c.card.object == 'card'
-#        end
-#
-#        should "execute should return a new, fully executed charge when passed correct parameters" do
-#          @mock.expects(:post).with do |url, api_key, params|
-#            url == "#{Conekta.api_base}/v1/charges" && api_key.nil? && CGI.parse(params) == {
-#              'currency' => ['usd'], 'amount' => ['100'],
-#              'card[exp_year]' => ['2012'],
-#              'card[number]' => ['4242424242424242'],
-#              'card[exp_month]' => ['11']
-#            }
-#          end.once.returns(test_response(test_charge))
-#
-#          c = Conekta::Charge.create({
-#            :amount => 100,
-#            :card => {
-#              :number => "4242424242424242",
-#              :exp_month => 11,
-#              :exp_year => 2012,
-#            },
-#            :currency => "usd"
-#          })
-#          assert c.paid
-#        end
-#
-#      end
-#
-#
-#      context "error checking" do
-#
-#        should "404s should raise an InvalidRequestError" do
-#          response = test_response(test_missing_id_error, 404)
-#          @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 404))
-#
-#          begin
-#            Conekta::Charge.new("test_charge").refresh
-#            assert false #shouldn't get here either
-#          rescue Conekta::InvalidRequestError => e # we don't use assert_raises because we want to examine e
-#            assert e.kind_of? Conekta::InvalidRequestError
-#            assert_equal "id", e.param
-#            assert_equal "Missing id", e.message
-#            return
-#          end
-#
-#          assert false #shouldn't get here
-#        end
-#
-#        should "5XXs should raise an APIError" do
-#          response = test_response(test_api_error, 500)
-#          @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 500))
-#
-#          begin
-#            Conekta::Charge.new("test_charge").refresh
-#            assert false #shouldn't get here either
-#          rescue Conekta::APIError => e # we don't use assert_raises because we want to examine e
-#            assert e.kind_of? Conekta::APIError
-#            return
-#          end
-#
-#          assert false #shouldn't get here
-#        end
-#
-#        should "402s should raise a CardError" do
-#          response = test_response(test_invalid_exp_year_error, 402)
-#          @mock.expects(:get).once.raises(RestClient::ExceptionWithResponse.new(response, 402))
-#
-#          begin
-#            Conekta::Charge.new("test_charge").refresh
-#            assert false #shouldn't get here either
-#          rescue Conekta::CardError => e # we don't use assert_raises because we want to examine e
-#            assert e.kind_of? Conekta::CardError
-#            assert_equal "invalid_expiry_year", e.code
-#            assert_equal "exp_year", e.param
-#            assert_equal "Your card's expiration year is invalid", e.message
-#            return
-#          end
-#
-#          assert false #shouldn't get here
-#        end
-#      end
+  describe Conekta::Account, "#retrieve" do
+    it "account should be retrievable" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      resp = {:email => "test+bindings@conekta.com", :charge_enabled => false, :details_submitted => false}
+      @mock.should_receive(:get){test_response(resp)}.once
+      a = Conekta::Account.retrieve
+      "test+bindings@conekta.com".should eq(a.email)
+      a.charge_enabled.should eq(false)
+      a.details_submitted.should eq(false)
+
+      Conekta.mock_rest_client = nil
     end
+  end
+
+  describe Conekta::ListObject, "#all" do
+    it "be able to retrieve full lists given a listobject" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:get){
+        test_response(test_charge_array)
+      }.twice
+
+      c = Conekta::Charge.all
+      c.should be_kind_of(Conekta::ListObject)
+      '/charges'.should eq(c.url)
+      all = c.all
+      all.should be_kind_of(Conekta::ListObject)
+      '/charges'.should eq(all.url)
+      all.data.should be_kind_of(Array)
+
+      Conekta.mock_rest_client = nil
+    end
+  end
+
+
+  describe "charge tests" do
+    it "charges should be listable" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:get){
+        test_response(test_charge_array)
+      }.once
+      c = Conekta::Charge.all
+      c.data.should be_kind_of(Array)
+      c.each do |charge|
+        charge.should be_kind_of(Conekta::Charge)
+      end
+
+      Conekta.mock_rest_client = nil
+    end
+
+    it "charges should be refundable" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.expects(:get).never
+      @mock.should_receive(:post){test_response({:id => "ch_test_charge", :refunded => true})}.once
+      c = Conekta::Charge.new("test_charge")
+      c.refund
+      c.refunded.should eq(true)
+
+      Conekta.mock_rest_client = nil
+    end
+
+    it "charges should not be deletable" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:get){test_response(test_charge)}.once
+      c = Conekta::Charge.retrieve("test_charge")
+      expect{c.delete}.to raise_error(NoMethodError)
+
+      Conekta.mock_rest_client = nil
+    end
+
+
+    it "charges should be updateable" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:get){test_response(test_charge)}.once
+      @mock.should_receive(:post){test_response(test_charge)}.once
+      c = Conekta::Charge.new("test_charge")
+      c.refresh
+      c.mnemonic = "New charge description"
+      c.save
+
+      Conekta.mock_rest_client = nil
+    end
+
+    it "charges should have Card objects associated with their Card property" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:get){test_response(test_charge)}.once
+      c = Conekta::Charge.retrieve("test_charge")
+      c.card.should be_kind_of(Conekta::ConektaObject)
+      #&& c.card.object == 'card'
+
+      Conekta.mock_rest_client = nil
+    end
+
+    it "execute should return a new, fully executed charge when passed correct parameters" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:post){|url, api_key, params|
+        url.should eq("#{Conekta.api_base}/charges.json") 
+        api_key.should eq(nil) 
+        params.should eq({
+          :currency => 'usd', 
+          :amount => 100,
+          :card=>{
+            :number => '4242424242424242',
+            :exp_month => 11,
+            :exp_year => 2012
+          }
+        })
+
+        test_response(test_charge)
+      }.once
+
+      c = Conekta::Charge.create({
+        :amount => 100,
+        :card => {
+          :number => "4242424242424242",
+          :exp_month => 11,
+          :exp_year => 2012,
+        },
+        :currency => "usd"
+      })
+      c.paid.should eq(true)
+
+      Conekta.mock_rest_client = nil
+    end
+  end
+
+  describe Conekta::ConektaError do
+    it "404s should raise an ResourceNotFoundError" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      response = test_response(test_missing_id_error, 404)
+      @mock.should_receive(:get){raise RestClient::ExceptionWithResponse.new(response, 404)}.once
+
+      begin
+        Conekta::Charge.new("test_charge").refresh
+      rescue Conekta::ResourceNotFoundError => e # we don't use assert_raises because we want to examine e
+        puts e.param
+        puts e.message
+        e.should be_kind_of(Conekta::ResourceNotFoundError)
+        "id".should eq(e.param)
+        "Invalid id value".should eq(e.message)
+      end
+
+      Conekta.mock_rest_client = nil
+    end
+
+    it "5XXs should raise an APIError" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      response = test_response(test_api_error, 500)
+      @mock.should_receive(:get){raise RestClient::ExceptionWithResponse.new(response, 500)}.once
+
+      begin
+        Conekta::Charge.new("test_charge").refresh
+      rescue Conekta::APIError => e # we don't use assert_raises because we want to examine e
+        e.should be_kind_of(Conekta::APIError)
+      end
+
+      Conekta.mock_rest_client = nil
+    end
+
+    it "402s should raise a CardError" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      response = test_response(test_invalid_exp_year_error, 402)
+      @mock.should_receive(:get){raise RestClient::ExceptionWithResponse.new(response, 402)}.once
+
+      begin
+        Conekta::Charge.new("test_charge").refresh
+      rescue Conekta::CardError => e # we don't use assert_raises because we want to examine e
+        e.should be_kind_of(Conekta::CardError)
+        "invalid_expiry_year".should eq(e.code)
+        "exp_year".should eq(e.param)
+        "Your card's expiration year is invalid".should eq(e.message)
+      end
+
+      Conekta.mock_rest_client = nil
+    end
+  end
+end

@@ -273,30 +273,24 @@ end
 
 def test_invalid_exp_year_error
   {
-    "error" => {
       "code" => "invalid_expiry_year",
       "param" => "exp_year",
       "type" => "card_error",
       "message" => "Your card's expiration year is invalid"
-    }
   }
 end
 
 def test_missing_id_error
   {
-    :error => {
       :param => "id",
       :type => "parameter_validation_error",
       :message => "Invalid id value"
-    }
   }
 end
 
 def test_api_error
   {
-    :error => {
       :type => "api_error"
-    }
   }
 end
 
