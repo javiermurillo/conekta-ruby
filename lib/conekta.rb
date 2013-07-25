@@ -181,7 +181,6 @@ module Conekta
   end
 
   def self.execute_request(opts)
-    puts 'executing!!!!!!!!!'
     RestClient::Request.execute(opts)
   end
 

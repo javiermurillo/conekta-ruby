@@ -697,8 +697,6 @@ class ConektaTest < Test::Unit::TestCase
       begin
         Conekta::Charge.new("test_charge").refresh
       rescue Conekta::ResourceNotFoundError => e # we don't use assert_raises because we want to examine e
-        puts e.param
-        puts e.message
         e.should be_kind_of(Conekta::ResourceNotFoundError)
         "id".should eq(e.param)
         "Invalid id value".should eq(e.message)
