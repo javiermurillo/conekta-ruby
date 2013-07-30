@@ -35,5 +35,9 @@ module Conekta
     def dispute_url
       url + '/dispute'
     end
+
+    def charges
+      Event.all({ :charge_id => id }, @api_key)
+    end
   end
 end

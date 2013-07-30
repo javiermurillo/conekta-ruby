@@ -25,6 +25,7 @@ require 'conekta/account'
 require 'conekta/list_object'
 require 'conekta/charge'
 require 'conekta/event'
+require 'conekta/log'
 
 # Errors
 require 'conekta/errors/conekta_error'
@@ -37,7 +38,7 @@ require 'conekta/errors/parameter_validation_error'
 require 'conekta/errors/authentication_error'
 
 module Conekta
-  @api_base = 'https://paymentsapi-dev.herokuapp.com'
+  @api_base = 'https://api.conekta.io'
 
   @ssl_bundle_path  = File.dirname(__FILE__) + '/data/ca-certificates.crt'
   @verify_ssl_certs = true
