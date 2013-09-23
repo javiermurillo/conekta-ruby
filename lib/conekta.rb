@@ -166,17 +166,20 @@ module Conekta
 
   def self.request_headers(api_key)
     headers = {
-      :user_agent => "Conekta/v1 RubyBindings/#{Conekta::VERSION}",
-      :authorization => "Token token='#{api_key}'",
-      :content_type => 'application/json' #'application/x-www-form-urlencoded'
+      :user_agent => "Conekta RubyBindings/#{Conekta::VERSION}",
+      :authorization => "Basic #{Base64.encode64(api_key+':')}"
     }
 
-    headers[:conekta_version] = api_version if api_version
+    if api_version
+      headers.update(:content_type=>"application/vnd.conekta-v#{api_version}+json")
+    else
+      headers.update(:content_type=>"application/vnd.conekta+json")
+    end
 
     begin
-      headers.update(:x_conekta_client_user_agent => Conekta::JSON.dump(user_agent))
+      headers.update(:conekta_client_user_agent => Conekta::JSON.dump(user_agent))
     rescue => e
-      headers.update(:x_conekta_client_raw_user_agent => user_agent.inspect,
+      headers.update(:conekta_client_raw_user_agent => user_agent.inspect,
                      :error => "#{e} (#{e.class})")
     end
   end
