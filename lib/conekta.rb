@@ -5,6 +5,7 @@ require 'set'
 require 'openssl'
 require 'rest_client'
 require 'multi_json'
+require 'base64'
 
 # Version
 require 'conekta/version'
