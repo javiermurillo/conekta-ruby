@@ -88,7 +88,8 @@ module Conekta
       url += "#{URI.parse(url).query ? '&' : '?'}#{uri_encode(params)}" if params && params.any?
       payload = nil
     else
-      payload = params#uri_encode(params)
+      payload = params.to_json#uri_encode(params)
+      headers[:content_type] = 'application/json'
     end
 
     request_opts.update(:headers => request_headers(api_key).update(headers),
