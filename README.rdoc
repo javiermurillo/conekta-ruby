@@ -19,4 +19,4 @@ If you want to build the gem from source:
 
 == Development
 
-Test cases can be run with: `bundle exec rake test`
+Test cases can be run with: `bundle exec rake spec`

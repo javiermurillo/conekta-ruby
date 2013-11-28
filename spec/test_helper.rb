@@ -34,6 +34,17 @@ def test_response(body, code=200)
   m
 end
 
+def test_token(params={})
+  {
+    :livemode => false,
+    :used => false,
+    :object => "token",
+    :id => "c_test_token",
+    :created => 1304114758,
+    :card => test_token_card
+  }.merge(params)
+end
+
 def test_customer(params={})
   {
     :subscription_history => [],
@@ -101,6 +112,19 @@ def test_card_array(customer_id)
     :object => 'list',
     :url => '/customers/' + customer_id + '/cards'
   }
+end
+
+def test_token_card(params={})
+  {
+    :type => "Visa",
+    :last4 => "4242",
+    :exp_month => 11,
+    :country => "US",
+    :exp_year => 2012,
+    :id => "cc_test_card",
+    :customer => 'c_test_token',
+    :object => "card"
+  }.merge(params)
 end
 
 def test_card(params={})

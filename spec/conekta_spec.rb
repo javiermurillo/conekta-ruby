@@ -157,7 +157,7 @@ class ConektaTest < Test::Unit::TestCase
       Conekta.api_key = nil
 
       Conekta.should_receive(:execute_request){|opts|
-        opts[:headers][:authorization].should eq("Token token='sk_test_local'")
+        opts[:headers][:authorization].should eq("Basic c2tfdGVzdF9sb2NhbDo=\n")
         test_response(test_charge)
       }
 
@@ -169,7 +169,7 @@ class ConektaTest < Test::Unit::TestCase
       Conekta.api_key = "global"
 
       Conekta.should_receive(:execute_request){|opts|
-        opts[:headers][:authorization].should eq("Token token='sk_test_local'")
+        opts[:headers][:authorization].should eq("Basic c2tfdGVzdF9sb2NhbDo=\n")
         test_response(test_charge)
       }
 
@@ -182,12 +182,12 @@ class ConektaTest < Test::Unit::TestCase
 
       Conekta.should_receive(:execute_request){|opts|
         opts[:url].should eq("#{Conekta.api_base}/charges/ch_test_charge.json")
-        opts[:headers][:authorization].should eq("Token token='sk_test_local'")
+        opts[:headers][:authorization].should eq("Basic c2tfdGVzdF9sb2NhbDo=\n")
         test_response(test_charge)
       }
       Conekta.should_receive(:execute_request){|opts|
         opts[:url].should eq("#{Conekta.api_base}/charges/ch_test_charge/refund.json")
-        opts[:headers][:authorization].should eq("Token token='sk_test_local'")
+        opts[:headers][:authorization].should eq("Basic c2tfdGVzdF9sb2NhbDo=\n")
         test_response(test_charge)
       }
 
@@ -352,7 +352,7 @@ class ConektaTest < Test::Unit::TestCase
       @mock.should_receive(:post){|url, api_key, params|
         "#{Conekta.api_base}/charges.json".should eq(url)
         api_key.should eq(nil)
-        {:amount => 50, :currency=>'usd', :card=>{}}.should eq(params)
+        {:amount => 50, :currency=>'usd', :card=>{}}.should eq(JSON.parse(params).symbolize_keys)
 
         test_response({ :count => 1, :data => [test_charge] })
       }
@@ -405,7 +405,7 @@ class ConektaTest < Test::Unit::TestCase
       params = { :amount => 100, :currency => 'usd', :card => 'sc_token' }
       @mock.should_receive(:post){|url, get, post|
         get.should eq(nil)
-        post.should eq({:amount => 100, :currency => 'usd', :card => 'sc_token'})
+        JSON.parse(post).symbolize_keys.should eq({:amount => 100, :currency => 'usd', :card => 'sc_token'})
         test_response(test_charge)
       }
       c = Conekta::Charge.create(params)
@@ -463,7 +463,7 @@ class ConektaTest < Test::Unit::TestCase
       @mock.should_receive(:post){|url, api_key, params|
         url.should eq("#{Conekta.api_base}/charges/ch_test_charge.json")
         api_key.should eq(nil)
-        params.should eq({:mnemonic => 'another_mn'})
+        JSON.parse(params).symbolize_keys.should eq({:mnemonic => 'another_mn'})
         test_response(test_charge)
       }.once
       c = Conekta::Charge.construct_from(test_charge)
@@ -582,6 +582,64 @@ class ConektaTest < Test::Unit::TestCase
     end
   end
 
+describe "customer with token tests" do
+    it "execute should return a new customer" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:post){|url, api_key, params|
+        url.should eq("#{Conekta.api_base}/customers.json") 
+        api_key.should eq(nil) 
+        JSON.parse(params).symbolize_keys.should eq({
+          :cards=>["TOKEN_ID"]
+        })
+
+        test_response(test_customer)
+      }.once
+
+      c = Conekta::Customer.create({
+        :cards => ["TOKEN_ID"],
+      })
+      c.cards.first.last4.should eq("4242")
+
+      Conekta.mock_rest_client = nil
+    end
+  end
+
+  describe "token tests" do
+    it "execute should return a new token" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:post){|url, api_key, params|
+        url.should eq("#{Conekta.api_base}/tokens.json") 
+        api_key.should eq(nil) 
+        params = JSON.parse(params).symbolize_keys 
+        params[:card] = params[:card].symbolize_keys
+        params.should eq({
+          :card => {
+            :number => "4242424242424242",
+            :exp_month => 11,
+            :exp_year => 2012,
+          }
+        })
+
+        test_response(test_token)
+      }.once
+
+      t = Conekta::Token.create({
+        :card => {
+          :number => "4242424242424242",
+          :exp_month => 11,
+          :exp_year => 2012,
+        }
+      })
+      t.used.should eq(false)
+
+      Conekta.mock_rest_client = nil
+    end
+  end
+
 
   describe "charge tests" do
     it "charges should be listable" do
@@ -657,7 +715,9 @@ class ConektaTest < Test::Unit::TestCase
 
       @mock.should_receive(:post){|url, api_key, params|
         url.should eq("#{Conekta.api_base}/charges.json") 
-        api_key.should eq(nil) 
+        api_key.should eq(nil)
+        params = JSON.parse(params).symbolize_keys 
+        params[:card] = params[:card].symbolize_keys
         params.should eq({
           :currency => 'usd', 
           :amount => 100,
