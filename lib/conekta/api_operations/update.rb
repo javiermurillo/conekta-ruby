@@ -6,7 +6,7 @@ module Conekta
           values = {}
           @unsaved_values.each { |k| values[k] = @values[k] }
           values.delete(:id)
-          response, api_key = Conekta.request(:post, url, @api_key, values)
+          response, api_key = Conekta.request(:put, url, @api_key, values)
           refresh_from(response, api_key)
         end
         self
