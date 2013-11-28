@@ -582,7 +582,7 @@ class ConektaTest < Test::Unit::TestCase
     end
   end
 
-describe "customer with token tests" do
+  describe "customer with token tests" do
     it "execute should return a new customer" do
       @mock = double
       Conekta.mock_rest_client = @mock
