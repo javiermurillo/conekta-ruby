@@ -34,6 +34,18 @@ def test_response(body, code=200)
   m
 end
 
+def test_plan(params={})
+  {
+    :id => "gold-plan",
+    :name => "Gold Plan",
+    :amount => 10000,
+    :frequency => "month",
+    :trial_period_days => 15,
+    :object => "plan",
+    :expiry_count => 12
+  }
+end
+
 def test_token(params={})
   {
     :livemode => false,

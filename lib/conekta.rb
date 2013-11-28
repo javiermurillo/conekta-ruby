@@ -27,6 +27,7 @@ require 'conekta/list_object'
 require 'conekta/charge'
 require 'conekta/customer'
 require 'conekta/token'
+require 'conekta/plan'
 require 'conekta/event'
 require 'conekta/log'
 

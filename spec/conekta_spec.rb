@@ -606,6 +606,44 @@ class ConektaTest < Test::Unit::TestCase
     end
   end
 
+  describe "plan tests" do
+    it "execute should return a new plan" do
+      @mock = double
+      Conekta.mock_rest_client = @mock
+
+      @mock.should_receive(:post){|url, api_key, params|
+        url.should eq("#{Conekta.api_base}/plans.json") 
+        api_key.should eq(nil) 
+        JSON.parse(params).symbolize_keys.should eq({
+          :id => "gold-plan",
+          :name => "Gold Plan",
+          :amount => 10000,
+          :currency => "MXN",
+          :interval => "month",
+          :frequency => 1,
+          :trial_period_days => 15,
+          :expiry_count => 12
+        })
+
+        test_response(test_plan)
+      }.once
+
+      p = Conekta::Plan.create({
+          :id => "gold-plan",
+          :name => "Gold Plan",
+          :amount => 10000,
+          :currency => "MXN",
+          :interval => "month",
+          :frequency => 1,
+          :trial_period_days => 15,
+          :expiry_count => 12
+      })
+      p.id.should eq("gold-plan")
+
+      Conekta.mock_rest_client = nil
+    end
+  end
+
   describe "token tests" do
     it "execute should return a new token" do
       @mock = double
