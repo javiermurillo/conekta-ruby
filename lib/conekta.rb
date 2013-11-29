@@ -15,6 +15,7 @@ require 'conekta/api_operations/create'
 require 'conekta/api_operations/update'
 require 'conekta/api_operations/delete'
 require 'conekta/api_operations/list'
+require 'conekta/api_operations/modify_member'
 
 # Resources
 require 'conekta/util'
