@@ -1,0 +1,27 @@
+module Conekta
+  class Customer < APIResource
+    include Conekta::APIOperations::Create
+    include Conekta::APIOperations::Delete
+    include Conekta::APIOperations::Update
+    include Conekta::APIOperations::List
+    include Conekta::APIOperations::CreateMember
+
+    def create_subscription(params={})
+      self.create_member('subscription', params)
+    end
+
+    def create_card(params={})
+      self.create_member('cards', params)
+    end
+
+    def url
+      unless id = self['id']
+        raise ParameterValidationError.new("Could not determine which URL to request: #{self.class} instance has invalid ID: #{id.inspect}", 'id')
+      end
+      unless customer = self.customer
+        raise ParameterValidationError.new("Could not determine which URL to request: #{self.class} instance has invalid customer: #{customer.inspect}", 'customer')
+      end
+      "#{Conekta::Customer.url}/#{CGI.escape(customer.id)}/cards/#{CGI.escape(id)}"
+    end
+  end
+end
