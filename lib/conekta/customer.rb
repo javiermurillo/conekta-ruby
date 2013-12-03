@@ -6,6 +6,17 @@ module Conekta
     include Conekta::APIOperations::List
     include Conekta::APIOperations::CreateMember
 
+    def refresh_from(values, api_key, partial=false)
+      super
+      customer = self
+      for i in 0..customer.cards.count
+        customer.cards[i].customer = customer
+      end
+      if !customer.subscription.blank?
+        customer.subscription.customer = customer
+      end
+    end
+
     def create_subscription(params={})
       self.create_member('subscription', params)
     end

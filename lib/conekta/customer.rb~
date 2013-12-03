@@ -13,11 +13,5 @@ module Conekta
     def create_card(params={})
       self.create_member('cards', params)
     end
-
-    private
-
-    def subscription_url
-      url + '/subscription'
-    end
   end
 end
