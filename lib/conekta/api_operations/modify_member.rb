@@ -2,14 +2,11 @@ module Conekta
   module APIOperations
     module ModifyMember
       module ClassMethods
-        def modify_member(method, member, action=nil, params={}, api_key=nil)
-          if action
-            path = "#{self.url}/#{member}/#{action}"
-          else
-            path = "#{self.url}/#{member}"
-          end
+        def modify_member(parent, member, params={}, action, method, api_key=nil)
+          path = "#{path}/#{member}/#{action}"
           response, api_key = Conekta.request(method.to_sym, path, api_key, params)
-          Util.convert_to_conekta_object(response, api_key)
+          self.try("#{parent}".to_sym).try("#{member}".to_sym) = self
+          self
         end
       end
 
