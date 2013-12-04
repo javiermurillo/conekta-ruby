@@ -46,8 +46,7 @@ require 'conekta/errors/parameter_validation_error'
 require 'conekta/errors/authentication_error'
 
 module Conekta
-#  @api_base = 'https://api.conekta.io'
-  @api_base = 'http://localhost:3000'
+  @api_base = 'https://api.conekta.io'
 
   @ssl_bundle_path  = File.dirname(__FILE__) + '/data/ca-certificates.crt'
   @verify_ssl_certs = true

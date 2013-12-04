@@ -6,20 +6,200 @@ charge = Conekta::Charge.create({
   "reference_id"=>"9839-wolf_pack",
   "card"=> "tok_test_visa_4242"
   })
-Conekta.api_key="1tv5yJp3xnVZ7eK67m4h"
+#<Conekta::Charge:0x4b8a584> JSON: {
+  "id": "529f5c51cfc26cd15f000001",
+  "livemode": false,
+  "created_at": 1386175569,
+  "status": "pending_payment",
+  "currency": "MXN",
+  "description": "Stogies",
+  "reference_id": "9839-wolf_pack",
+  "failure_code": null,
+  "failure_message": null,
+  "object": "charge",
+  "amount": 20000,
+  "fee": 998,
+  "payment_method": {"name":"Fulanito Lopez","exp_month":"12","exp_year":"19","auth_code":null,"object":"card_payment","last4":"4242","brand":"visa"},
+  "details": {"name":null,"phone":null,"email":null,"line_items":[]}
+}
 customer = Conekta::Customer.create({"cards"=> ["tok_test_visa_4242"]})
+#<Conekta::Customer:0x4e2cf3a> JSON: {
+  "id": "cus_mvWeMJftBGnhuPzPQ",
+  "email": null,
+  "name": null,
+  "phone": null,
+  "livemode": false,
+  "default_card_id": "card_uHAemUaNvM2pa5Tf",
+  "object": "customer",
+  "created_at": 1386175612,
+  "cards": [
+    {"id":"card_uHAemUaNvM2pa5Tf","created_at":1386175612,"active":true,"last4":"4242","object":"card","exp_month":"12","exp_year":"19","brand":"VISA","name":"Fulanito Lopez"}
+  ],
+  "subscription": null
+}
 customer.cards[0].delete
+#<Conekta::Card:0x4e2c724> JSON: {
+  "id": "card_uHAemUaNvM2pa5Tf",
+  "created_at": 1386175612,
+  "active": true,
+  "last4": "4242",
+  "object": "card",
+  "exp_month": "12",
+  "exp_year": "19",
+  "brand": "VISA",
+  "name": "Fulanito Lopez",
+  "deleted": true
+}
+customer.cards
+[]
 customer.create_card({"token"=> "tok_test_visa_4242"})
+#<Conekta::Card:0x4ed7b1a> JSON: {
+  "id": "card_sQJ67YasvBqywCez",
+  "created_at": 1386175697,
+  "active": true,
+  "last4": "4242",
+  "object": "card",
+  "exp_month": "12",
+  "exp_year": "19",
+  "brand": "VISA",
+  "name": "Fulanito Lopez"
+}
 customer.cards[0].update(:token => "tok_test_visa_1881")
+#<Conekta::Card:0x4ed7b1a> JSON: {
+  "id": "card_sQJ67YasvBqywCez",
+  "created_at": 1386175697,
+  "active": true,
+  "last4": "1881",
+  "object": "card",
+  "exp_month": "12",
+  "exp_year": "19",
+  "brand": "VISA",
+  "name": "Fulanito Lopez"
+}
+customer.cards
+[#<Conekta::Card:0x4ed7b1a> JSON: {
+  "id": "card_sQJ67YasvBqywCez",
+  "created_at": 1386175697,
+  "active": true,
+  "last4": "1881",
+  "object": "card",
+  "exp_month": "12",
+  "exp_year": "19",
+  "brand": "VISA",
+  "name": "Fulanito Lopez"
+}]
 plan = Conekta::Plan.retrieve("gold-plan")
+#<Conekta::Plan:0x4ee1c00> JSON: {
+  "id": "gold-plan",
+  "livemode": false,
+  "created_at": 1385481591,
+  "name": "Gold Plan",
+  "amount": 10000,
+  "currency": "MXN",
+  "interval": "week",
+  "frequency": 1,
+  "expiry_count": null,
+  "trial_period_days": null,
+  "object": "plan"
+}
 plan.update({
   :id => "gold-plan",
   :name => "Gold Plan",
-  :amount => 10000,
+  :amount => 20000,
   :currency => "MXN",
   :interval => "month",
   :frequency => 1,
   :trial_period_days => 15,
   :expiry_count => 12})
+#<Conekta::Plan:0x4ee1c00> JSON: {
+  "id": "gold-plan",
+  "livemode": false,
+  "created_at": 1385481591,
+  "name": "Gold Plan",
+  "amount": 20000,
+  "currency": "MXN",
+  "interval": "month",
+  "frequency": 1,
+  "expiry_count": 12,
+  "trial_period_days": 15,
+  "object": "plan"
+}
+plan
+=> #<Conekta::Plan:0x4ee1c00> JSON: {
+  "id": "gold-plan",
+  "livemode": false,
+  "created_at": 1385481591,
+  "name": "Gold Plan",
+  "amount": 20000,
+  "currency": "MXN",
+  "interval": "month",
+  "frequency": 1,
+  "expiry_count": 12,
+  "trial_period_days": 15,
+  "object": "plan"
+}
 subscription = customer.create_subscription({:plan => "gold-plan"})
+#<Conekta::Subscription:0x4da1ea8> JSON: {
+  "id": "sub_GxJJGD5V2fez2sjKP",
+  "status": "in_trial",
+  "object": "subscription",
+  "created_at": 1386175781,
+  "start": 1386175781,
+  "billing_cycle_start": 1386175781,
+  "billing_cycle_end": 1388767781,
+  "plan_id": "gold-plan",
+  "card_id": "card_sQJ67YasvBqywCez"
+}
 subscription.cancel
+#<Conekta::Subscription:0x4da1ea8> JSON: {
+  "id": "sub_GxJJGD5V2fez2sjKP",
+  "status": "canceled",
+  "object": "subscription",
+  "created_at": 1386175781,
+  "start": 1386175781,
+  "billing_cycle_start": 1386175781,
+  "billing_cycle_end": 1388767781,
+  "plan_id": "gold-plan",
+  "card_id": "card_sQJ67YasvBqywCez",
+  "canceled_at": 1386175791
+}
+subscription
+#<Conekta::Subscription:0x4da1ea8> JSON: {
+  "id": "sub_GxJJGD5V2fez2sjKP",
+  "status": "canceled",
+  "object": "subscription",
+  "created_at": 1386175781,
+  "start": 1386175781,
+  "billing_cycle_start": 1386175781,
+  "billing_cycle_end": 1388767781,
+  "plan_id": "gold-plan",
+  "card_id": "card_sQJ67YasvBqywCez",
+  "canceled_at": 1386175791
+}
+subscription.pause
+ #<Conekta::Subscription:0x4da1ea8> JSON: {
+  "id": "sub_GxJJGD5V2fez2sjKP",
+  "status": "paused",
+  "object": "subscription",
+  "created_at": 1386175781,
+  "start": 1386175781,
+  "billing_cycle_start": 1386175781,
+  "plan_id": "gold-plan",
+  "card_id": "card_sQJ67YasvBqywCez",
+  "canceled_at": 1386175791,
+  "paused_at": 1386175833
+}
+subscription.resume
+#<Conekta::Subscription:0x4da1ea8> JSON: {
+  "id": "sub_GxJJGD5V2fez2sjKP",
+  "status": "active",
+  "object": "subscription",
+  "created_at": 1386175781,
+  "start": 1386175781,
+  "billing_cycle_start": 1386175781,
+  "plan_id": "gold-plan",
+  "card_id": "card_sQJ67YasvBqywCez",
+  "canceled_at": 1386175791,
+  "billing_cycle_end": 1388767798
+}
+
