@@ -3,16 +3,26 @@ module Conekta
     include Conekta::APIOperations::Update
     include Conekta::APIOperations::ModifyMember
 
+    attr_accessor :customer
+    
+    def customer
+      @customer
+    end
+
+    def customer=(customer)
+      @customer = customer
+    end
+
     def cancel
-      self.modify_member("customer", "subscription", nil, "cancel", "post")
+      self.modify_member("subscription", "cancel")
     end
 
     def pause
-      self.modify_member("customer", "subscription", nil, "pause", "post")
+      subscription = self.modify_member("subscription", "pause")
     end
 
     def resume
-      self.modify_member("customer", "subscription", nil, "resume", "post")
+      subscription = self.modify_member("subscription", "resume")
     end
 
     def url

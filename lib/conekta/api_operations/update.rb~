@@ -11,6 +11,30 @@ module Conekta
         end
         self
       end
+      def update(params={})
+        response, api_key = Conekta.request(:put, url, @api_key, params)
+        refresh_from(response, api_key)
+        self
+      end
+#      def modify_member(member, action, params={}, api_key=nil)
+#        path = "/customers/#{customer.id}/#{member}/#{action}"
+#        response, api_key = Conekta.request("post", path, api_key, {:foo => "var"})
+#        refresh_from(response, api_key)
+#        self
+#      end
+def create_member(member, params={}, api_key=nil)
+          path = "/customers/#{self.id}/#{member}"
+          response, api_key = Conekta.request(:post, path, api_key, params)
+          obj = Util.convert_to_conekta_object(response, api_key)
+          if obj.class == ConektaObject
+            count = self.cards.count
+            self.cards[count] = obj
+          else
+            self.subscription = obj
+          end
+          obj
+        end
+
     end
   end
 end

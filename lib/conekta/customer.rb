@@ -9,20 +9,27 @@ module Conekta
     def refresh_from(values, api_key, partial=false)
       super
       customer = self
-      for i in 0..customer.cards.count
+      for i in 0..(customer.cards.count - 1)
+        puts "entra"
         customer.cards[i].customer = customer
       end
-      if !customer.subscription.blank?
+      if customer.subscription
         customer.subscription.customer = customer
       end
     end
 
     def create_subscription(params={})
-      self.create_member('subscription', params)
+      subscription = create_member('subscription', params)
+      subscription.customer = self
+      self.subscription = subscription
+      subscription
     end
 
     def create_card(params={})
-      self.create_member('cards', params)
+      card = create_member('cards', params)
+      card.customer = self
+      self.cards << card
+      card
     end
   end
 end

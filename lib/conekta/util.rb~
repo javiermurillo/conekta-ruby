@@ -21,8 +21,7 @@ module Conekta
         'list' => ListObject,
         'card' => Card,
         'subscription' => Subscription,
-        'customer' => Customer,
-        'plan' => Plan
+        'customer' => Customer
       }
     end
 

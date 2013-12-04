@@ -1,17 +1,37 @@
 module Conekta
-  class Customer < APIResource
-    include Conekta::APIOperations::Create
-    include Conekta::APIOperations::Delete
+  class Card < APIResource
     include Conekta::APIOperations::Update
-    include Conekta::APIOperations::List
-    include Conekta::APIOperations::CreateMember
 
-    def create_subscription(params={})
-      self.create_member('subscription', params)
+    attr_accessor :customer
+    
+    def customer
+      @customer
     end
 
-    def create_card(params={})
-      self.create_member('cards', params)
+    def customer=(customer)
+      @customer = customer
+    end
+
+    def update(params={}, customer)
+      response, api_key = Conekta.request(:put, url, @api_key, params)
+      refresh_from(response, api_key)
+      self.customer = customer
+      self
+    end
+
+    def delete
+      response, api_key = Conekta.request(:delete, url, @api_key)
+      refresh_from(response, api_key)
+      deleted_card = self
+      i = 0
+      for card in self.customer.cards
+        if deleted_card.id == card.id
+          self.customer.cards.delete_at(i)
+          break
+        end
+        i = i + 1
+      end
+      deleted_card
     end
 
     def url

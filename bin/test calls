@@ -1,0 +1,25 @@
+Conekta.api_key="1tv5yJp3xnVZ7eK67m4h"
+charge = Conekta::Charge.create({
+  "description"=>"Stogies",
+  "amount"=> 20000,
+  "currency"=>"MXN",
+  "reference_id"=>"9839-wolf_pack",
+  "card"=> "tok_test_visa_4242"
+  })
+Conekta.api_key="1tv5yJp3xnVZ7eK67m4h"
+customer = Conekta::Customer.create({"cards"=> ["tok_test_visa_4242"]})
+customer.cards[0].delete
+customer.create_card({"token"=> "tok_test_visa_4242"})
+customer.cards[0].update(:token => "tok_test_visa_1881")
+plan = Conekta::Plan.retrieve("gold-plan")
+plan.update({
+  :id => "gold-plan",
+  :name => "Gold Plan",
+  :amount => 10000,
+  :currency => "MXN",
+  :interval => "month",
+  :frequency => 1,
+  :trial_period_days => 15,
+  :expiry_count => 12})
+subscription = customer.create_subscription({:plan => "gold-plan"})
+subscription.cancel

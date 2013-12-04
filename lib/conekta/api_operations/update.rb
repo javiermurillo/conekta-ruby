@@ -11,6 +11,12 @@ module Conekta
         end
         self
       end
+
+      def update(params={})
+        response, api_key = Conekta.request(:put, url, @api_key, params)
+        refresh_from(response, api_key)
+        self
+      end
     end
   end
 end

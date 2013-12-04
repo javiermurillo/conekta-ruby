@@ -2,6 +2,16 @@ module Conekta
   class Card < APIResource
     include Conekta::APIOperations::Update
 
+    attr_accessor :customer
+    
+    def customer
+      @customer
+    end
+
+    def customer=(customer)
+      @customer = customer
+    end
+
     def delete
       response, api_key = Conekta.request(:delete, url, @api_key)
       refresh_from(response, api_key)

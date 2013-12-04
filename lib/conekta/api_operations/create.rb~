@@ -1,9 +1,9 @@
 module Conekta
   module APIOperations
-    module CreateMember
+    module Create
       module ClassMethods
-        def create_member(member, params={}, api_key=nil)
-          path = "#{path}/#{member}"
+def create_member(member, params={}, api_key=nil)
+          path = "/customers/#{self.id}/#{member}"
           response, api_key = Conekta.request(:post, path, api_key, params)
           obj = Util.convert_to_conekta_object(response, api_key)
           if obj.class == ConektaObject
@@ -14,6 +14,12 @@ module Conekta
           end
           obj
         end
+        def create(params={}, api_key=nil)
+          response, api_key = Conekta.request(:post, self.url, api_key, params)
+          Util.convert_to_conekta_object(response, api_key)
+        end
+
+        
       end
 
       def self.included(base)
