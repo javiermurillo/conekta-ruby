@@ -175,7 +175,7 @@ module Conekta
     if api_version
       headers.update(:accept=>"application/vnd.conekta-v#{api_version}+json")
     else
-      headers.update(:accept=>"application/vnd.conekta-v0.2.0+json")
+      headers.update(:accept=>"application/vnd.conekta-v0.3.0+json")
     end
 
     begin
