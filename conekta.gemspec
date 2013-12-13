@@ -7,8 +7,8 @@ spec = Gem::Specification.new do |s|
   s.version = Conekta::VERSION
   s.summary = 'Ruby bindings for the Conekta API'
   s.description = 'Easy payments and shipping, see http://conekta.mx for details.'
-  s.authors = ['Leo Fischer']
-  s.email = ['leo@conekta.mx']
+  s.authors = ['Leo Fischer', 'Mauricio Murga']
+  s.email = %w(leo@conekta.mx mauricio@conekta.com)
   s.homepage = 'http://conekta.mx/doc'
 
   s.add_dependency('rest-client', '~> 1.4')
