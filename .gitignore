@@ -1,4 +1,9 @@
 *.gem
+*.swo
+*.swn
+*.swm
+*.swp
+*~
 *.rbc
 .bundle
 .config
